@@ -56,6 +56,8 @@ Next, opening the .csv reader code from dowloaded file, converting the file form
 This is followed by arranging the csv data into lists of rows to be used in the environment,
 accomplished by appending the rows into the row list. Then the figure is created (7 x & diameter),
 with four axes added (left, bottom, width, height), which is scaled to the full extent of the data.
+Agents are created to host the x and y coordinates (td_xs/ys), which are granted access to the
+environment and other agents.
 '''
 
 f = open('in.txt', newline='') 
@@ -78,60 +80,86 @@ ax = fig.add_axes([0, 0, 1, 1])
 
 #ax.set_autoscale_on(False)
 
-####
 
 # Make the agents.
 for i in range(num_of_agents):
     y = int(td_ys[i].text)
     x = int(td_xs[i].text)
-    
+    #appending access to the agents
     agents.append(agentframework.Agent(environment,agents,x,y))
-   
+
+# code continues when true
 carry_on = True	 
 
 ####
 
+"""
+The def update generates a new frame for each iteration. Within the frame, the agents 
+move randomly, but are restricted t oa fixed number of movements, or iterations, within the 
+environment where they eat the data over 10, to place within the store and share with neighbours.
+"""
+
 def update(frame_number):
     
+    #starts animation
     fig.clear()   
     global carry_on    
    
     #Move each agent
     for j in range(num_of_iterations):
         for i in range(num_of_agents):
-            random.shuffle(agents) #move agents in a different order each time
+            #move agents in a different order each time
+            random.shuffle(agents) 
+  
             agents[i].move()
             agents[i].eat()
             agents[i].share_with_neighbours(neighbourhood)
             
 ####
+
+"""
+The section focused on ending the sequence, which occurs when the data storage is full.
+These final coordinates are printed, and stored within 'data_eaten.csv'.
+"""
      if agents[i].store > total_fill:
-        carry_on = False #changes whether or not to carry on
+        #changes whether or not to carry on
+        carry_on = False 
         print("stopping condition. Final coordinates =")
 
         #write data_eaten.csv file with amount stored by agents
         s = 0
         for agent in agents:
-            s += agent.store #sum agent store
+            #sum agent store
+            s += agent.store 
         f3 = open('data_eaten.csv', 'a', newline = '')
         writer = csv.writer(f3, delimiter = ',')
-        f3.write(str(s) + "\n") #write new entries to a new line
-        f3.close() #realease file after use  
+        #write new entries to a new line
+        f3.write(str(s) + "\n")
+        #realease file after use
+        f3.close()   
     
 ####
+"""
+The plotting of x & y data between 0-99 coordinated into a figure, and as a scatter graph
+printing each iteration.
+"""
 
     matplotlib.pyplot.xlim(0, 99)
     matplotlib.pyplot.ylim(0, 99)
     matplotlib.pyplot.imshow(environment)
-    if random.random() < 0.001:
-        carry_on = False
-        print("stopping condition")
-               
-#plotting scatter
+   
+    for i in range (num_of_agents):       
+        #plotting scatter
         matplotlib.pyplot.scatter(agents[i].x, agents[i].y)
         print (agents [i].x, agents [i].y)
         
 ####
+
+"""
+gen_function determins if the programme should continue to run, or to stop it. 
+The run function below then projects the composed files as an animated model, showing the agents
+moving within the environment, eating and storing the data.
+"""
 
 def gen_function(b = [0]):
     
@@ -141,13 +169,18 @@ def gen_function(b = [0]):
         yield a			# Returns control and waits next call.
         a = a + 1
         
-####
-
+        
 # animation function
 def run():
     animation = matplotlib.animation.FuncAnimation(fig, update, repeat=False, frames=gen_function)
     canvas.show()
 
+####
+
+"""
+Building a Graphical User Interface (GUI) using the imported Tkinter. We provide a name for
+'Model', menu bar, and command button called 'Run model'.
+"""
 
 # main window for GUI
 root = tkinter.Tk() 
