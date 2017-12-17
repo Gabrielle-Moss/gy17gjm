@@ -5,32 +5,36 @@ Created on Tue Dec  5 12:46:57 2017
 @author: gy17gjm
 """
 #import section
-import random
 import operator
 import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.backends.backend_tkagg
 import matplotlib.pyplot
 import matplotlib.animation
-import agentframework
-import csv
-import requests
-import bs4
-import tkinter
+import agentframework #import agentframework file
+import csv #csv file library
+import requests #access data URL
+import bs4 #webscraping
+import tkinter #GUI
 
 #####
 
-num_of_agents = 10
+num_of_agents = 10 
+#number of agents created
 num_of_iterations = 100
+#number of movements allowed per agent
 neighbourhood = 20
+#maximum distance agents can be to interact
 total_fill = 1000
-
-agents = []
-environment = []
+#max data store size
 
 #####
-
-#request and imputs coordinates from provided resource 
+"""
+The importation of x and y web data provided, these coordinates are used to form the
+agent locations. The extraction of this data is accomplished with the use of beautiful soup
+which extracts HTML files.
+"""
+ 
 r = requests.get('http://www.geog.leeds.ac.uk/courses/computing/practicals/python/agent-framework/part9/data.html')
 content = r.text
 
@@ -39,12 +43,21 @@ soup = bs4.BeautifulSoup(content, 'html.parser')
 td_ys = soup.find_all(attrs={"class" : "y"})
 td_xs = soup.find_all(attrs={"class" : "x"})
 
-print(td_ys) #print coordinates from imported data
+print(td_ys) 
 print(td_xs)
+
+agents = []
+environment = []
+#creating empty lists from agents and environment
+
 ####
+'''
+Next, opening the .csv reader code from dowloaded file, converting the file format.
+This is followed by arranging the csv data into lists of rows to be used in the environment,
+accomplished by appending the rows into the row list. Then the figure is created (7 x & diameter),
+with four axes added (left, bottom, width, height), which is scaled to the full extent of the data.
+'''
 
-
-#csv reader code from file, edited to suit purpose
 f = open('in.txt', newline='') 
 reader = csv.reader(f, quoting=csv.QUOTE_NONNUMERIC)
 
@@ -58,13 +71,11 @@ for row in reader:				# A list of rows
     environment.append(row_list)
  f.close() 
 
-####
 
 #set up the figure
 fig = matplotlib.pyplot.figure(figsize=(7, 7))
-ax = fig.add_axes([0, 0, 1, 1]) #add axes [left, bottom, width, height]
+ax = fig.add_axes([0, 0, 1, 1]) 
 
-#axis is scaled to the full extent of the data
 #ax.set_autoscale_on(False)
 
 ####
